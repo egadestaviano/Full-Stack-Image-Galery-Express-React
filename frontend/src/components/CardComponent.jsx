@@ -10,8 +10,13 @@ import { IoMdTrash } from "react-icons/io";
 import { confirmAlert } from "react-confirm-alert";
 import { MdCancel } from "react-icons/md";
 import { FaRegCheckCircle } from "react-icons/fa";
+import { useState } from "react";
+import ImageModal from "./ImageModal.jsx";
+import FavoriteToggle from "./FavoriteToggle.jsx";
 
-const CardComponent = ({ product, getProducts }) => {
+const CardComponent = ({ product, getProducts, isSelected, onSelect }) => {
+  const [showModal, setShowModal] = useState(false);
+
   const deleteProduct = async (id) => {
     try {
       const out = await axios.delete(`/api/products/${id}`);
@@ -20,8 +25,8 @@ const CardComponent = ({ product, getProducts }) => {
         position: "top-center",
       });
     } catch (error) {
-      const errMessage = JSON.parse(error.request.response);
-      toast.error(errMessage.message, {
+      const errMessage = error.response?.data?.message || "Failed to delete product";
+      toast.error(errMessage, {
         position: "top-center",
       });
     }
@@ -52,29 +57,71 @@ const CardComponent = ({ product, getProducts }) => {
       },
     });
   };
+
   return (
-    <Col md={4} xs={6} className="mb-4">
-      <Card className="shadow">
-        <Card.Img width={"100%"} height={250} variant="top" src={product.url} />
-        <Card.Body>
-          <Card.Title>{product.name}</Card.Title>
-          <div className="text-end">
-            <Link to={`/edit/${product.id}`} className="btn btn-success me-2">
-              <MdEdit /> Edit
-            </Link>
-            <Button onClick={() => confirmDel(product.id)} variant="danger">
-              <IoMdTrash /> Delete
-            </Button>
+    <>
+      <Col xxl={3} xl={3} lg={4} md={6} sm={6} xs={12} className="mb-4">
+        <Card className={`shadow h-100 ${isSelected ? 'border-primary border-2' : ''}`}>
+          <div 
+            onClick={() => setShowModal(true)}
+            style={{ cursor: "pointer", position: "relative" }}
+          >
+            {onSelect && (
+              <div 
+                className="position-absolute top-0 start-0 m-2"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onSelect(product.id);
+                }}
+              >
+                <div 
+                  className={`rounded-circle border d-flex align-items-center justify-content-center ${isSelected ? 'bg-primary border-primary' : 'bg-white border-secondary'}`}
+                  style={{ width: '24px', height: '24px' }}
+                >
+                  {isSelected && (
+                    <span className="text-white" style={{ fontSize: '14px' }}>✓</span>
+                  )}
+                </div>
+              </div>
+            )}
+            <Card.Img width={"100%"} height={250} variant="top" src={product.url} />
           </div>
-        </Card.Body>
-      </Card>
-    </Col>
+          <Card.Body className="d-flex flex-column">
+            <div className="d-flex justify-content-between align-items-start">
+              <Card.Title>{product.name}</Card.Title>
+              <FavoriteToggle productId={product.id} size="sm" />
+            </div>
+            {product.category && (
+              <div className="mb-2">
+                <span className="badge bg-secondary">{product.category.name}</span>
+              </div>
+            )}
+            <div className="mt-auto text-end">
+              <Link to={`/edit/${product.id}`} className="btn btn-success me-2">
+                <MdEdit /> Edit
+              </Link>
+              <Button onClick={() => confirmDel(product.id)} variant="danger">
+                <IoMdTrash /> Delete
+              </Button>
+            </div>
+          </Card.Body>
+        </Card>
+      </Col>
+      
+      <ImageModal 
+        show={showModal} 
+        handleClose={() => setShowModal(false)} 
+        product={product} 
+      />
+    </>
   );
 };
 
 CardComponent.propTypes = {
   product: PropTypes.object,
   getProducts: PropTypes.func,
+  isSelected: PropTypes.bool,
+  onSelect: PropTypes.func,
 };
 
 export default CardComponent;

@@ -11,10 +11,57 @@ datasource db {
 }
 
 model Product {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  image       String
+  url         String
+  categoryId  Int?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  category   Category? @relation(fields: [categoryId], references: [id])
+  favorites  Favorite[]
+  productTags ProductTag[]
+  tags       Tag[]     @relation("ProductToTag", references: [tagId], through: "ProductTag")
+}
+
+model Category {
   id        Int      @id @default(autoincrement())
   name      String
-  image     String
-  url       String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  products  Product[]
+}
+
+model Favorite {
+  id        Int      @id @default(autoincrement())
+  productId Int
+  // In a real app, we would have a userId field here
+  // userId    Int
+  createdAt DateTime @default(now())
+
+  product   Product  @relation(fields: [productId], references: [id])
+
+  @@unique([productId])
+}
+
+model Tag {
+  id          Int         @id @default(autoincrement())
+  name        String      @unique
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  productTags ProductTag[]
+  products    Product[]   @relation("ProductToTag", references: [productId], through: "ProductTag")
+}
+
+model ProductTag {
+  productId Int
+  tagId     Int
+  product   Product @relation(fields: [productId], references: [id])
+  tag       Tag     @relation(fields: [tagId], references: [id])
+
+  @@id([productId, tagId])
 }

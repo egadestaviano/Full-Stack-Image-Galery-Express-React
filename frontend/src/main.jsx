@@ -4,6 +4,7 @@ import App from "./App.jsx";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "react-toastify/dist/ReactToastify.css";
 import "react-confirm-alert/src/react-confirm-alert.css";
+import "./styles/darkMode.css";
 import axios from "axios";
 
 axios.defaults.headers.post["Content-Type"] =
