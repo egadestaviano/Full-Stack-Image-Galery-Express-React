@@ -289,3 +289,32 @@ export const bulkDeleteProducts = async (req, res) => {
     res.status(500).json({ message: error.message, response: null });
   }
 };
+
+export const getRecentProducts = async (req, res) => {
+  try {
+    const { limit = 5 } = req.query;
+    const limitNum = parseInt(limit);
+
+    const recentProducts = await prisma.product.findMany({
+      orderBy: {
+        createdAt: 'desc'
+      },
+      take: limitNum,
+      include: {
+        category: true,
+        tags: {
+          include: {
+            tag: true
+          }
+        }
+      }
+    });
+
+    res.json({
+      message: "success",
+      response: recentProducts
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message, response: null });
+  }
+};
