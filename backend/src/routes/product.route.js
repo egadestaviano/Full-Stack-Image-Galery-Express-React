@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   deleteProduct,
+  getRecentProducts,
   getProductById,
   getProducts,
   insertProduct,
@@ -10,6 +11,7 @@ import {
 const productRouter = Router();
 
 productRouter.get("/products", getProducts);
+productRouter.get("/products/recent", getRecentProducts);
 productRouter.get("/products/:id", getProductById);
 productRouter.post("/products", insertProduct);
 productRouter.put("/products/:id", updateProduct);
