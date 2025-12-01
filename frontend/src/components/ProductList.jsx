@@ -1,5 +1,6 @@
 import { Col, Row, Form, InputGroup, Button } from "react-bootstrap";
 import CardComponent from "./CardComponent.jsx";
+import RecentlyAdded from "./RecentlyAdded.jsx";
 import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
@@ -174,6 +175,9 @@ const ProductList = () => {
   return (
     <>
       <div className="container mt-3">
+        {/* Recently Added Section */}
+        <RecentlyAdded />
+        
         <Row>
           <Col>
             <div className="d-flex justify-content-between align-items-center">
